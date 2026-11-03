@@ -1,0 +1,41 @@
+name: 'App Build & Deploy'
+on:
+  push:
+    paths: ['app/**']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+    - uses: actions/checkout@v4
+    - uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: 'projects/YOUR_PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: 'github-actions-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com'
+    - name: Configure Docker Artifact Registry
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+    - name: Build and Push Microservices
+      run: |
+        docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/lab-repo/backend-api:latest ./app/backend-api
+        docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/lab-repo/backend-api:latest
+        
+        docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/lab-repo/users-service:latest ./app/users-service
+        docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/lab-repo/users-service:latest
+        
+        docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/lab-repo/frontend:latest ./app/frontend
+        docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/lab-repo/frontend:latest
+    - uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: 'lab-gke-cluster'
+        location: 'us-central1'
+    - name: Apply Kubernetes Manifests
+      run: |
+        kubectl apply -f app/k8s/namespace.yaml
+        kubectl apply -f app/k8s/postgres-pv.yaml
+        kubectl apply -f app/k8s/backend-deployment.yaml
+        kubectl apply -f app/k8s/users-deployment.yaml
+        kubectl apply -f app/k8s/frontend-deployment.yaml
