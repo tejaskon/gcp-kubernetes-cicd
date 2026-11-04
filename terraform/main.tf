@@ -17,6 +17,7 @@ resource "google_service_account" "gke_nodes_sa" {
 }
 
 resource "google_project_iam_member" "gke_node_roles" {
+  project = var.project_id
   for_each = toset([
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
@@ -51,6 +52,7 @@ resource "google_service_account" "github_actions_sa" {
 }
 
 resource "google_project_iam_member" "ci_cd_roles" {
+  project = var.project_id
   for_each = toset([
     "roles/artifactregistry.writer",
     "roles/container.developer"
