@@ -8,3 +8,5 @@ variable "region" {
   description = "GCP Region for resources"
   default     = "us-central1"
 }
+
+#new lines
