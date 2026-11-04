@@ -22,3 +22,6 @@ jobs:
         cd terraform
         terraform init
         terraform apply -auto-approve -var="project_id=sre-project-506813"
+
+
+#New lines
