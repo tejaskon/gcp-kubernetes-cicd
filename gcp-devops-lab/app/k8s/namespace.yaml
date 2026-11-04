@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: app
-  labels:
-    istio-injection: enabled # Automatically injects Istio sidecar proxy for observability & mesh communication
