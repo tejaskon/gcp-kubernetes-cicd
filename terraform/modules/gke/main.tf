@@ -24,3 +24,6 @@ resource "google_container_node_pool" "primary_nodes" {
     oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
   }
 }
+
+
+#neew lines
