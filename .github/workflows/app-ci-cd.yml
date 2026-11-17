@@ -12,19 +12,22 @@ jobs:
       id-token: 'write'
     steps:
     - uses: actions/checkout@v4
-    
-    # 1. Authenticate to Google Cloud via Workload Identity Federation
+
+    # 1. Authenticate to Google Cloud via Workload Identity Federation and export access token
     - uses: google-github-actions/auth@v2
+      id: auth
       with:
         workload_identity_provider: 'projects/95162175090/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
         service_account: 'github-actions-sa@sre-project-506813.iam.gserviceaccount.com'
-    
+        token_format: 'access_token'
+
     # 2. Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@v2
 
-    # 3. Configure Docker for Artifact Registry using gcloud
-    - name: Configure Docker Artifact Registry
-      run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+    # 3. Authenticate Docker directly using the exported OAuth2 access token
+    - name: Login to Artifact Registry
+      run: |
+        echo "${{ steps.auth.outputs.access_token }}" | docker login -u oauth2accesstoken --password-stdin us-central1-docker.pkg.dev
 
     # 4. Build and Push Microservices
     - name: Build and Push Microservices
