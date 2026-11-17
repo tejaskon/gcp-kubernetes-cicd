@@ -75,6 +75,7 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
     "attribute.actor"      = "assertion.actor"
     "attribute.repository" = "assertion.repository"
   }
+  attribute_condition = "assertion.repository == 'tejaskon/gcp-kubernetes-cicd'"
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
