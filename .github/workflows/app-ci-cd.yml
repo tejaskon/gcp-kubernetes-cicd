@@ -19,13 +19,11 @@ jobs:
         workload_identity_provider: 'projects/95162175090/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
         service_account: 'github-actions-sa@sre-project-506813.iam.gserviceaccount.com'
     
-    # 2. Setup gcloud CLI (configures gcloud to use the authenticated session)
+    # 2. Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@v2
 
-    # 3. Authenticate Docker directly using the active gcloud token session
-    - name: Login to Artifact Registry
-      run: |
-        gcloud auth print-access-token --project=sre-project-506813 | docker login -u oauth2accesstoken --password-stdin us-central1-docker.pkg.dev
+    # 3. Setup Google Cloud Docker credential helper
+    - uses: google-github-actions/setup-docker-credential-helper@v4
 
     # 4. Build and Push Microservices
     - name: Build and Push Microservices
