@@ -22,9 +22,9 @@ jobs:
     # 2. Setup gcloud CLI (configures gcloud to use the authenticated session)
     - uses: google-github-actions/setup-gcloud@v2
 
-    # 3. Configure Docker to use Artifact Registry securely via gcloud helper
-    - name: Configure Docker Artifact Registry
-      run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+    # 3. Authenticate Docker directly using the active gcloud token session
+    - name: Login to Artifact Registry
+      run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin us-central1-docker.pkg.dev
 
     # 4. Build and Push Microservices
     - name: Build and Push Microservices
