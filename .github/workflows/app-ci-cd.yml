@@ -22,8 +22,9 @@ jobs:
     # 2. Setup gcloud CLI
     - uses: google-github-actions/setup-gcloud@v2
 
-    # 3. Setup Google Cloud Docker credential helper
-    - uses: google-github-actions/setup-docker-credential-helper@v4
+    # 3. Configure Docker for Artifact Registry using gcloud
+    - name: Configure Docker Artifact Registry
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
     # 4. Build and Push Microservices
     - name: Build and Push Microservices
