@@ -46,6 +46,7 @@ jobs:
         location: 'us-central1'
 
     # 6. Apply Kubernetes Manifests
+    #
     - name: Apply Kubernetes Manifests
       run: |
         kubectl apply -f app/k8s/namespace.yaml
