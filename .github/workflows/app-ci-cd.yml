@@ -24,7 +24,8 @@ jobs:
 
     # 3. Authenticate Docker directly using the active gcloud token session
     - name: Login to Artifact Registry
-      run: gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin us-central1-docker.pkg.dev
+      run: |
+        gcloud auth print-access-token --project=sre-project-506813 | docker login -u oauth2accesstoken --password-stdin us-central1-docker.pkg.dev
 
     # 4. Build and Push Microservices
     - name: Build and Push Microservices
