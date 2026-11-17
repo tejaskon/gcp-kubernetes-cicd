@@ -12,16 +12,22 @@ jobs:
       id-token: 'write'
     steps:
     - uses: actions/checkout@v4
+    
+    # 1. Authenticate to Google Cloud via Workload Identity Federation
     - uses: google-github-actions/auth@v2
+      id: auth
       with:
         workload_identity_provider: 'projects/95162175090/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
         service_account: 'github-actions-sa@sre-project-506813.iam.gserviceaccount.com'
     
-    # Required: Sets up the gcloud CLI tool so subsequent steps can find it
+    # 2. Setup gcloud CLI using the authenticated session
     - uses: google-github-actions/setup-gcloud@v2
 
+    # 3. Configure Docker to use Artifact Registry with token helper
     - name: Configure Docker Artifact Registry
       run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+    # 4. Build and Push Microservices
     - name: Build and Push Microservices
       run: |
         docker build -t us-central1-docker.pkg.dev/sre-project-506813/gcp-kubernetes-cicd/backend-api:latest ./app/backend-api
@@ -32,10 +38,14 @@ jobs:
         
         docker build -t us-central1-docker.pkg.dev/sre-project-506813/gcp-kubernetes-cicd/frontend:latest ./app/frontend
         docker push us-central1-docker.pkg.dev/sre-project-506813/gcp-kubernetes-cicd/frontend:latest
+
+    # 5. Fetch GKE Credentials
     - uses: google-github-actions/get-gke-credentials@v2
       with:
         cluster_name: 'lab-gke-cluster'
         location: 'us-central1'
+
+    # 6. Apply Kubernetes Manifests
     - name: Apply Kubernetes Manifests
       run: |
         kubectl apply -f app/k8s/namespace.yaml
